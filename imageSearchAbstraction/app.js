@@ -11,11 +11,11 @@ app.get('/', function (req, res) {
     res.end("<h1>Halo from the other side</h1>");
 });
 
-app.get('/favicon.ico', function (req, res) {
+app.use('/favicon.ico', function (req, res) {
     res.end("<h1>Halo from the other side</h1>");
 });
 
-app.get('/robots.txt', function (req, res) {
+app.use('/robots.txt', function (req, res) {
     res.end("<h1>Halo from the other side</h1>");
 });
 
