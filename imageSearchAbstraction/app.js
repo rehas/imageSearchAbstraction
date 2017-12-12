@@ -16,7 +16,19 @@ var app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/is', function (req, res) {
-    is(req.originalUrl, function (data) {
+    
+    var obj = {
+        oURL : req.originalUrl,
+        headers : req.headers,
+        body : req.body,
+        bURL : req.baseUrl,
+        hostname: req.hostname,
+        path: req.path,
+        query: req.query
+    }
+    
+
+    is(obj, function (data) {
         res.send(JSON.stringify(data));
     });
 });

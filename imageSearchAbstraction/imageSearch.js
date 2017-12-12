@@ -8,6 +8,7 @@
 module.exports = function (str, callback) {
 
     console.log("We're in Image Search Baby");
+    console.log(JSON.stringify(str));
 
-    callback(resTest);
+    callback(str);
 };
