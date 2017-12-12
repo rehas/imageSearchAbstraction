@@ -1,6 +1,6 @@
 ﻿//#region initilanizations
 var express = require('express');
-var port = process.env.port;
+var port = process.env.PORT || 1350;
 
 console.log('Port ' + port);
 console.log('Hello world');
