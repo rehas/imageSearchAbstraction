@@ -29,7 +29,16 @@ app.use('/api/is', function (req, res) {
     
 
     is(obj, function (data) {
-        res.send(JSON.stringify(data));
+        console.log("data came");
+        console.log(JSON.parse(data));
+        //var x = new Map();
+        //var x = JSON.parse(data)
+        
+    //    for (var i in Object.keys(data)) {
+    //    x.set(i, data[i]);
+    //}
+
+        res.send(data);
     });
 });
 
