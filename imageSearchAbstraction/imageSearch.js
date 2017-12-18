@@ -11,6 +11,14 @@ var res = {};
 var transferObject = [];
 //#endregion
 
+//#region db initialization
+var MongoClient = require('mongodb').MongoClient;
+var dbURL = "";
+var collectionStr = "";
+
+
+//#endregion
+
 
 module.exports = function (str, callback) {
     
@@ -47,15 +55,33 @@ module.exports = function (str, callback) {
     //#region query handling
 
     var qStr = str.path.slice(1);
+    var qPrm = str.query.offset;
+    console.log("qPrm is  " + qPrm);
+    var qPrm2 = str.query.page;
+    console.log("qPrm2 is  " + qPrm2);
     console.log("We're in Image Search Baby");
     console.log("Our query string is: " + qStr);
+    console.log("Our param is: " + JSON.stringify(str.query.offset));
     
+    var pageProperty = 1;
+    
+    if (qPrm !== undefined) {
+        pageProperty = qPrm
+    } else if (qPrm2 !== undefined) {
+        pageProperty = qPrm2
+    };
+
+    
+    
+    console.log("Our page property is >>> " + pageProperty);
+
     //#endregion
     
     //#region get results
     var getResults = function (callback) {
         var gr = setTimeout(function (pass) {
-            client.search(qStr, { page: 1 }).
+            var searchTerm = decodeURI(qStr);
+            client.search(searchTerm, { page: pageProperty }).
                 then(function (response) {
                     //#region console testleri
                     //console.log("WERE IN THEN\n\n");
