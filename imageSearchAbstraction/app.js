@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var port = process.env.PORT || 1350;
 var is = require('./imageSearch.js');
+var latest = require('./latest.js');
 
 console.log('Port ' + port);
 console.log('Hello world');
@@ -29,6 +30,25 @@ app.use('/api/is', function (req, res) {
         res.send(data);
     });
 });
+
+app.use('/api/latest/is', function (req, res) {
+    var obj = {
+        oURL : req.originalUrl,
+        headers : req.headers,
+        body : req.body,
+        bURL : req.baseUrl,
+        hostname: req.hostname,
+        path: req.path,
+        query: req.query
+    }
+
+    latest(obj, function (data) {
+        console.log("Data came to Latest");
+        console.log(JSON.parse(data));
+        console.log(data);
+        res.send(data);
+    });
+})
 
 //#region misc path handling for favicon and robots
 
