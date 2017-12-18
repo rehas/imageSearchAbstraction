@@ -1,5 +1,6 @@
 ﻿//#region initialization
 var async = require('async');
+var MongoClient = require('mongodb').MongoClient;
 
 var gApiKey = "AIzaSyBzUxb68xDEQ8hvFuzAvLJ9uk-uzO3Uu10";
 var CSEID = "007165501120063598584:bzvkbifi0lm";
@@ -12,13 +13,20 @@ var transferObject = [];
 //#endregion
 
 //#region db initialization
-var MongoClient = require('mongodb').MongoClient;
-var dbURL = "";
-var collectionStr = "";
-
+var dbURL = "mongodb://heroku_7rpcp6qs:samvk6sgru0hvp2ch24kadghn8@ds149535.mlab.com:49535/heroku_7rpcp6qs";
+var collectionStr = "imageSearchDB";
 
 //#endregion
 
+var insertOneDocument = function (db, qStr, callback) {
+    var collection = db.collection(collectionStr.toString());
+    collection.insertOne(
+        {
+            searchTerm : qStr.toString(),
+            time: new Date()
+        }
+    )
+};
 
 module.exports = function (str, callback) {
     
@@ -70,11 +78,26 @@ module.exports = function (str, callback) {
     } else if (qPrm2 !== undefined) {
         pageProperty = qPrm2
     };
+    
+    MongoClient.connect(dbURL, function (err, db) {
+        if (err) {
+            console.log("DB CONNECTION ERROR  " + err); return
+        } else {
+            var searchTermToDB = decodeURI(qStr);
+            console.log("SearchTermToDB  \n" + searchTermToDB);
+            console.log("qStr in DB Insertion  \n" + qStr);
+            console.log("We have a DB connection  " + db);
+            insertOneDocument(db, searchTermToDB ,function (_, docs) {
+                console.log("Inserted Docs are  ", +docs);
+                db.close();
+            });
+        }
 
+    });
     
     
     console.log("Our page property is >>> " + pageProperty);
-
+    
     //#endregion
     
     //#region get results
@@ -83,28 +106,28 @@ module.exports = function (str, callback) {
             var searchTerm = decodeURI(qStr);
             client.search(searchTerm, { page: pageProperty }).
                 then(function (response) {
-                    //#region console testleri
-                    //console.log("WERE IN THEN\n\n");
-                    //console.log("Headers = " + response.headers);
-                    //console.log("Body = " + response.body);
-                    //console.log("PROMISE = " + response.Promise);
-                    //console.log("DATA = " + response.data);
-                    //console.log("response Length >> " + response.length);
+                //#region console testleri
+                //console.log("WERE IN THEN\n\n");
+                //console.log("Headers = " + response.headers);
+                //console.log("Body = " + response.body);
+                //console.log("PROMISE = " + response.Promise);
+                //console.log("DATA = " + response.data);
+                //console.log("response Length >> " + response.length);
                 
-                    //console.log("Transfer Object status as of" + i + "   " +JSON.stringify(transferObject));
-
-                    //TODO : burdasin, transfer Object'i dolduramadik, array denenebilir, 
-                    //TODO obje yapisi bastan olusturulabilir, objeye push etmenin methodu vardir belki
-                    //Buranin possible cozumu : https://stackoverflow.com/questions/2295496/convert-array-to-json 
-                    //Yani array olarak tut TransferObject'i, doldurduktan sonra, JSON Stringify yap, sonra da parse et. 
-                    //#endregion
+                //console.log("Transfer Object status as of" + i + "   " +JSON.stringify(transferObject));
+                
+                //TODO : burdasin, transfer Object'i dolduramadik, array denenebilir, 
+                //TODO obje yapisi bastan olusturulabilir, objeye push etmenin methodu vardir belki
+                //Buranin possible cozumu : https://stackoverflow.com/questions/2295496/convert-array-to-json 
+                //Yani array olarak tut TransferObject'i, doldurduktan sonra, JSON Stringify yap, sonra da parse et. 
+                //#endregion
                 pass = response;
-               // console.log(pass);
+                // console.log(pass);
                 res = pass;
                 console.log("RES  =   " + JSON.stringify(res));
             });
         }, 500);
-            callback();    
+        callback();
     }
     
     //#endregion
@@ -112,7 +135,7 @@ module.exports = function (str, callback) {
     //#region fill transfer object
     var fillTransferObject = function (callback) {
         setTimeout(function () {
-            console.log("Our res is    " + JSON.stringify(res[5]) );
+            console.log("Our res is    " + JSON.stringify(res[5]));
             for (var i = 0; i < res.length; i++) {
                 var transferItem = {
                     url: "",
@@ -143,11 +166,11 @@ module.exports = function (str, callback) {
                 transferObject[i] = transferItem;
             }
             console.log("TransFerItem after FTO   \n\n" + JSON.stringify(transferObject));
-        callback();
+            callback();
         }, 3500);
     }
     //#endregion
-
+    
     //console.log(res);
     
     //#region Final Syncronious Execution
@@ -158,9 +181,9 @@ module.exports = function (str, callback) {
             setTimeout(function () {
                 //var x = res.slice(8);
                 console.log("We're now in async series last");
-                console.log("\n\n\n" + JSON.stringify( transferObject) );
+                console.log("\n\n\n" + JSON.stringify(transferObject));
                 //console.log(res['Promise']);
-                callback(JSON.stringify( transferObject));
+                callback(JSON.stringify(transferObject));
             }, 6500)
             
         },
